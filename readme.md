@@ -1,5 +1,3 @@
-Here's the updated version of the README with the customizable folder path mention:
-
 # TeleTubby
 
 TeleTubby is a telegram bot that allows you to repost videos from a specific YouTube channel to a Telegram channel. It uses the `yt_dlp` library to fetch video information and download the videos, and the `telegram-send` command-line tool to send the videos to the Telegram channel.

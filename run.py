@@ -1,12 +1,14 @@
+import argparse
 import logging
 import os
 import sqlite3
-import argparse
-import yt_dlp
-from pyrogram import Client
-from decouple import config
-import uvloop
 
+import uvloop
+import yt_dlp
+from decouple import config
+from pyrogram import Client
+
+from helpers import process_description, process_title
 
 DB_NAME = 'videos.db'
 
@@ -25,7 +27,9 @@ def record_video_to_db(conn, id, title):
     logging.info(f'Video {id}, {title} has been added')
 
 
-def fetch_and_notify(app, yt_channel_id, tg_chat_id, folder_path, dry_run):
+def fetch_and_notify(app, yt_channel_id, tg_chat_id, folder_path, dry_run,
+                     adjust_description=lambda x: x,
+                     adjust_title=lambda x: x):
     ydl_opts = {'quiet': True, 'extract_flat': True, 'outtmpl': f'{folder_path}/%(id)s.%(ext)s', 'format': 'mp4'}
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -56,8 +60,9 @@ def fetch_and_notify(app, yt_channel_id, tg_chat_id, folder_path, dry_run):
                             file_path = f'{folder_path}/{video_id}.mp4'
 
                             try:
-                                video_title_fmt = f"<b>{video['title']}</b>"
-                                video_description_fmt = f"\n{video['description']}" if video['description'] else ''
+                                video_title_fmt = f"<b>{adjust_title(video['title'])}</b>"
+                                video_description_fmt = (
+                                    f"\n{adjust_description(video['description'])}" if video['description'] else '')
 
                                 logging.info(f'Sending {video_id} to {tg_chat_id}')
                                 app.send_video(
@@ -95,7 +100,14 @@ def main(app):
         raise ValueError('Invalid log level: %s' % args.log_level)
     logging.basicConfig(level=numeric_level, format='%(asctime)s - %(levelname)s - %(message)s')
 
-    fetch_and_notify(app, args.yt_channel_id, args.tg_chat_id, args.folder, args.dry_run)
+    fetch_and_notify(
+        app,
+        args.yt_channel_id,
+        args.tg_chat_id,
+        args.folder,
+        args.dry_run,
+        adjust_description=process_description,
+        adjust_title=process_title)
     logging.info(f"Job finished")
 
 

@@ -1,14 +1,15 @@
 # TeleTubby
 
-TeleTubby is a telegram bot that allows you to repost videos from a specific YouTube channel to a Telegram channel. It uses the `yt_dlp` library to fetch video information and download the videos, and the `telegram-send` command-line tool to send the videos to the Telegram channel.
+TeleTubby is a Telegram bot that allows you to repost videos from a specific YouTube channel to a Telegram chat. It 
+uses the `yt_dlp` library to fetch video information and download the videos, and the `pyrogram` library to send the videos to the Telegram chat. 
 
 ## Usage
 
-Once the TeleTubby is deployed and the cron job is set up, it will automatically fetch new videos from the specified YouTube channel and repost them to the Telegram channel. The video information will be stored in the SQLite database to avoid duplicate reposts.
+Once TeleTubby is deployed and running, it will automatically fetch new videos from the specified YouTube channel and repost them to the designated Telegram chat. The video information will be stored in an SQLite database to avoid duplicate reposts.
 
 You can customize the folder path where the videos are saved by using the `-f` or `--folder` flag when running the script. For example:
 ```bash
-python run.py -c CHANNEL_ID -f /path/to/video/folder
+python run.py -y YOUTUBE_CHANNEL_ID -t TELEGRAM_CHAT_ID -f /path/to/video/folder
 ```
 
 ## Prerequisites
@@ -16,11 +17,22 @@ python run.py -c CHANNEL_ID -f /path/to/video/folder
 Before running the script, make sure you have the following dependencies installed:
 
 - Python 3.10+
-- Spare [Telegram bot](https://core.telegram.org/bots#how-do-i-create-a-bot)
+- A Telegram [bot token](https://core.telegram.org/bots#how-do-i-create-a-bot)
+- Telegram [API ID and API Hash](https://core.telegram.org/api/obtaining_api_id)
+
+## Configuration
+
+The script requires the following configuration variables to be set:
+
+- `API_ID`: Your Telegram API ID.
+- `API_HASH`: Your Telegram API Hash.
+- `BOT_TOKEN`: Your Telegram bot token.
+
+You can set these variables in a `.env` file which would be [parsed by decouple library](https://github.com/HBNetwork/python-decouple?tab=readme-ov-file#env-file).
 
 ## Deployment
 
-To deploy the TeleTubby, follow these steps:
+To deploy TeleTubby, follow these steps:
 
 1. Clone the project repository:
    ```bash
@@ -47,38 +59,21 @@ To deploy the TeleTubby, follow these steps:
    pip install -r requirements.txt
    ```
 
-6. Configure the `telegram-send` tool by following the instructions provided in its [documentation](https://github.com/rahiel/telegram-send?tab=readme-ov-file#installation):
+6. Set up the required configuration variables in a `.env` file or as environment variables.
+
+7. Run the script with the desired arguments:
    ```bash
-   telegram-send --configure
+   python run.py -y YOUTUBE_CHANNEL_ID -t TELEGRAM_CHAT_ID -f /path/to/video/folder
    ```
+   Replace `YOUTUBE_CHANNEL_ID` with the ID of the YouTube channel you want to repost videos from, `TELEGRAM_CHAT_ID` with the ID of the Telegram chat where the videos will be sent, and `/path/to/video/folder` with the desired folder path where the videos will be saved (default is `/tmp`).
 
-7. Perform a dry run to populate the database with existing videos on the YouTube channel:
-   ```bash
-   python run.py -c CHANNEL_ID --dry-run
-   ```
-   Replace `CHANNEL_ID` with the ID of the YouTube channel you want to repost videos from.
+## Additional Features
 
-8. Set up a cron job to run the script periodically. Create a bash script with the following content:
-   ```bash
-   #!/usr/bin/env bash
+- Dry run mode: You can perform a dry run by using the `-d` or `--dry-run` flag. This will populate the database with existing videos on the YouTube channel without actually downloading or sending them to Telegram.
 
-   set -e
+- Logging: The script uses the `logging` module to log messages. You can customize the log level using the `-l` or `--log-level` flag (default is 'info').
 
-   cd "$HOME/teletubby/"  # path to the folder with the project
-   source .venv/bin/activate
-   python run.py -c CHANNEL_ID -f /path/to/video/folder
-   ```
-   Replace `CHANNEL_ID` with the ID of the YouTube channel you want to repost videos from, and `/path/to/video/folder` with the desired folder path where the videos will be saved (default is `/tmp`).
-
-   Make the bash script executable:
-   ```bash
-   chmod +x script.sh
-   ```
-
-   Add the script to your crontab to run it periodically, for example, every 30 minutes:
-   ```
-   */30 * * * * /path/to/script.sh
-   ```
+- Progress tracking: The script provides a progress callback function to track the progress of video uploads to Telegram.
 
 ## Fair Usage and Legal Considerations
 
@@ -86,9 +81,9 @@ Please note that reposting videos from YouTube to Telegram may be subject to cop
 
 When using TeleTubby, consider the following guidelines:
 
-* Only repost videos from channels that you have the necessary permissions or licenses for.
-* Provide proper attribution to the original content creators.
-* If a content creator requests the removal of their video from your Telegram channel, promptly comply with their request.
-* Be mindful of the frequency and volume of videos being reposted to avoid excessive or abusive usage of the bot.
+- Only repost videos from channels that you have the necessary permissions or licenses for.
+- Provide proper attribution to the original content creators.
+- If a content creator requests the removal of their video from your Telegram chat, promptly comply with their request.
+- Be mindful of the frequency and volume of videos being reposted to avoid excessive or abusive usage of the bot.
 
 It is the responsibility of the user to ensure that their use of TeleTubby complies with applicable laws and regulations. The developers of TeleTubby shall not be held liable for any misuse or illegal activities conducted using this tool.

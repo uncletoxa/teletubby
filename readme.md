@@ -69,6 +69,10 @@ To deploy TeleTubby, follow these steps:
 
 ## Additional Features
 
+- Customizable video info editing: You can add your own functions to process the video description or title 
+  before sending it to Telegram. The 'helpers.py' file provides two functions, `process_description` and 
+  `process_title`, which you can modify according to your needs, such as removing swear words, etc.
+
 - Dry run mode: You can perform a dry run by using the `-d` or `--dry-run` flag. This will populate the database with existing videos on the YouTube channel without actually downloading or sending them to Telegram.
 
 - Logging: The script uses the `logging` module to log messages. You can customize the log level using the `-l` or `--log-level` flag (default is 'info').

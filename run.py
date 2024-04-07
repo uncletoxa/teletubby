@@ -61,8 +61,9 @@ def fetch_and_notify(app, yt_channel_id, tg_chat_id, folder_path, dry_run,
 
                             try:
                                 video_title_fmt = f"<b>{adjust_title(video['title'])}</b>"
+                                video_description_adj = adjust_description(video['description'])
                                 video_description_fmt = (
-                                    f"\n{adjust_description(video['description'])}" if video['description'] else '')
+                                    f"\n{video_description_adj}" if video_description_adj else "")
 
                                 logging.info(f'Sending {video_id} to {tg_chat_id}')
                                 app.send_video(

@@ -61,9 +61,10 @@ def fetch_and_notify(app, yt_channel_id, tg_chat_id, folder_path, dry_run,
 
                             try:
                                 video_title_fmt = f"<b>{adjust_title(video['title'])}</b>"
-                                video_description_adj = adjust_description(video['description'])
-                                video_description_fmt = (
-                                    f"\n{video_description_adj}" if video_description_adj else "")
+                                if video['description']:
+                                    video_description_fmt = adjust_description(video['description'])
+                                else:
+                                    video_description_fmt = ''
 
                                 logging.info(f'Sending {video_id} to {tg_chat_id}')
                                 app.send_video(
@@ -77,7 +78,7 @@ def fetch_and_notify(app, yt_channel_id, tg_chat_id, folder_path, dry_run,
                                 record_video_to_db(conn, video_id, video_title)
 
                             except Exception as e:
-                                logging.error(f'Error occurred while sending video {video_id}: {str(e)}')
+                                raise RuntimeError('Error occurred while sending video %s', video_id) from e
 
                             finally:
                                 if os.path.exists(file_path):
